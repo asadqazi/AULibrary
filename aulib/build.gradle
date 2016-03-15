@@ -1,0 +1,83 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.interactive3amd.aulib' // Change this to match your package name
+version = '1.0.0' // Change this to match your version number
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+
+    dataBinding {
+        enabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:recyclerview-v7:23.2.0'
+
+}
+
+task generateSourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier 'sources'
+}
+
+task generateJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath()
+            .join(File.pathSeparator))
+}
+
+task generateJavadocsJar(type: Jar) {
+    from generateJavadocs.destinationDir
+    classifier 'javadoc'
+}
+
+generateJavadocsJar.dependsOn generateJavadocs
+
+
+artifacts {
+    archives generateJavadocsJar
+    archives generateSourcesJar
+}
+
+bintray {
+    user = 'asadqazzi'
+    key = '02a6e3ac1ee9999f54859e749f31e1a3a0eb9c70'
+    pkg {
+        repo = 'maven'
+        name = 'AULib' // the name of the package in BinTray
+
+        version {
+            name = 'aulib' // the name of your library project
+            desc = 'This is the first version'
+            released  = new Date()
+            vcsTag = '1.0.0' // the version
+        }
+
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/raffaeu/LicenseChecker.git' // your GitHub repo
+        websiteUrl = 'https://github.com/raffaeu/LicenseChecker' // your website or whatever has documentation
+    }
+    configurations = ['archives']
+}
+
+
